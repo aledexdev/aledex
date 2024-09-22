@@ -1,0 +1,20 @@
+Contract FeeCollectorFactoryImpl(
+  feeCollectorPerTokenPairTemplateId: ByteVec,
+  tokenPairFactory: TokenPairFactory
+) implements FeeCollectorFactory {
+    enum ErrorCodes {
+        InvalidCaller               = 16
+    }
+
+  @using(preapprovedAssets = true)
+  pub fn createFeeCollector(caller: Address, alphAmount: U256, tokenPair: TokenPair) -> ByteVec {
+    checkCaller!(callerContractId!() == contractId!(tokenPairFactory), ErrorCodes.InvalidCaller)
+    let (encodedImmFields, encodedMutFields) = FeeCollectorPerTokenPairImpl.encodeFields!(tokenPairFactory, tokenPair)
+    return copyCreateSubContract!{caller -> ALPH: alphAmount}(
+      contractId!(tokenPair),
+      feeCollectorPerTokenPairTemplateId,
+      encodedImmFields,
+      encodedMutFields
+    )
+  }
+}

@@ -1,0 +1,31 @@
+Contract FeeCollectorPerTokenPairImpl(
+  tokenPairFactory: TokenPairFactory,
+  tokenPair: TokenPair
+) implements FeeCollectorPerTokenPair {
+    enum ErrorCodes {
+        InvalidCaller               = 16
+    }
+
+  @using(preapprovedAssets = true, assetsInContract = true)
+  pub fn collectFee(from: Address, amount: U256) -> () {
+    checkCaller!(callerContractId!() == contractId!(tokenPair), ErrorCodes.InvalidCaller)
+    transferToken!(from, selfAddress!(), tokenId!(tokenPair), amount)
+  }
+
+  @using(assetsInContract = true)
+  pub fn withdraw(to: Address, amount: U256) -> () {
+    checkCaller!(callerAddress!() == tokenPairFactory.getFeeSetter(), ErrorCodes.InvalidCaller)
+    transferTokenFromSelf!(to, tokenId!(tokenPair), amount)
+  }
+
+  @using(assetsInContract = true)
+  pub fn destroy(to: Address) -> () {
+    checkCaller!(callerAddress!() == tokenPairFactory.getFeeSetter(), ErrorCodes.InvalidCaller)
+    destroySelf!(to)
+  }
+
+  pub fn collectFeeManually() -> () {
+    checkCaller!(callerAddress!() == tokenPairFactory.getFeeSetter(), ErrorCodes.InvalidCaller)
+    tokenPair.collectFeeManually()
+  }
+}
