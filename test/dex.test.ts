@@ -1,7 +1,6 @@
 import { TokenPair } from './../artifacts/ts/TokenPair'
 import {
   web3,
-  Project,
   TestContractParams,
   addressFromContractId,
   AssetOutput,
@@ -43,7 +42,6 @@ describe('[INTEGRATION TEST FOR DEX]', () => {
   const DEADLINE = 17148068220000n //very large timestamp
   beforeEach(async () => {
     web3.setCurrentNodeProvider('http://127.0.0.1:22973', undefined, fetch)
-    await Project.build()
   })
 
   it('Case 01: Should create pair successfully', async () => {

@@ -21,10 +21,14 @@ import {
   callMethod,
   multicallMethods,
   fetchContractState,
+  Asset,
   ContractInstance,
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
   addStdIdToFields,
   encodeContractFields,
 } from "@alephium/web3";
@@ -62,6 +66,24 @@ export namespace FeeCollectorFactoryImplTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+  export type MulticallReturnType<Callss extends MultiCallParams[]> = {
+    [index in keyof Callss]: MultiCallResults<Callss[index]>;
+  };
+
+  export interface SignExecuteMethodTable {
+    createFeeCollector: {
+      params: SignExecuteContractMethodParams<{
+        caller: Address;
+        alphAmount: bigint;
+        tokenPair: HexString;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<
@@ -76,11 +98,7 @@ class Factory extends ContractFactory<
     );
   }
 
-  getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as FeeCollectorFactoryImplTypes.Fields;
-  }
-
-  consts = { ErrorCodes: { InvalidCaller: BigInt(16) } };
+  consts = { ErrorCodes: { InvalidCaller: BigInt("16") } };
 
   at(address: string): FeeCollectorFactoryImplInstance {
     return new FeeCollectorFactoryImplInstance(address);
@@ -93,9 +111,22 @@ class Factory extends ContractFactory<
         { caller: Address; alphAmount: bigint; tokenPair: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "createFeeCollector", params);
+      return testMethod(
+        this,
+        "createFeeCollector",
+        params,
+        getContractByCodeHash
+      );
     },
   };
+
+  stateForTest(
+    initFields: FeeCollectorFactoryImplTypes.Fields,
+    asset?: Asset,
+    address?: string
+  ) {
+    return this.stateForTest_(initFields, asset, address, undefined);
+  }
 }
 
 // Use this object to test and deploy the contract
@@ -103,7 +134,7 @@ export const FeeCollectorFactoryImpl = new Factory(
   Contract.fromJson(
     FeeCollectorFactoryImplContractJson,
     "",
-    "966f75cddefe774a87dbf778012f4f3f494b3a860f4c975d0c5262a1be185d49",
+    "e87f8e9977e4744dec8127e83a2ce2ed19510a0f5f4a1c32def3eee32986325f",
     []
   )
 );
@@ -118,7 +149,7 @@ export class FeeCollectorFactoryImplInstance extends ContractInstance {
     return fetchContractState(FeeCollectorFactoryImpl, this);
   }
 
-  methods = {
+  view = {
     createFeeCollector: async (
       params: FeeCollectorFactoryImplTypes.CallMethodParams<"createFeeCollector">
     ): Promise<
@@ -134,14 +165,31 @@ export class FeeCollectorFactoryImplInstance extends ContractInstance {
     },
   };
 
-  async multicall<Calls extends FeeCollectorFactoryImplTypes.MultiCallParams>(
-    calls: Calls
-  ): Promise<FeeCollectorFactoryImplTypes.MultiCallResults<Calls>> {
+  transact = {
+    createFeeCollector: async (
+      params: FeeCollectorFactoryImplTypes.SignExecuteMethodParams<"createFeeCollector">
+    ): Promise<
+      FeeCollectorFactoryImplTypes.SignExecuteMethodResult<"createFeeCollector">
+    > => {
+      return signExecuteMethod(
+        FeeCollectorFactoryImpl,
+        this,
+        "createFeeCollector",
+        params
+      );
+    },
+  };
+
+  async multicall<
+    Callss extends FeeCollectorFactoryImplTypes.MultiCallParams[]
+  >(
+    ...callss: Callss
+  ): Promise<FeeCollectorFactoryImplTypes.MulticallReturnType<Callss>> {
     return (await multicallMethods(
       FeeCollectorFactoryImpl,
       this,
-      calls,
+      callss,
       getContractByCodeHash
-    )) as FeeCollectorFactoryImplTypes.MultiCallResults<Calls>;
+    )) as FeeCollectorFactoryImplTypes.MulticallReturnType<Callss>;
   }
 }

@@ -1,8 +1,8 @@
 {
-  "version": "v2.12.0",
+  "version": "v3.6.6",
   "name": "TokenA",
-  "bytecode": "060609121b4024402d4053010000000102ce0002010000000102ce0102010000000102ce0202010000000102ce0302010000000102a00002010201010011160013c48ac7230489e80000320c7bb4b11600aba00016002ba10005b416005f",
-  "codeHash": "34407405228f3303488a34eff3fcfcf328eb316fc85a1080d8ea98321de6af5c",
+  "bytecode": "060609121b40244032405d010000000102ce0002010000000102ce0102010000000102ce0202010000000102ce0302010000000103d323f4ce6aa00002010201010012d30fb898ce160013c48ac7230489e80000320c7bb4b11600aba00016002ba10005b416005f",
+  "codeHash": "a7b1d95a0d5b4142250e7ce74dfb49f023cd9121a4a61ad34c89df55ddb5c6fd",
   "fieldsSig": {
     "names": [
       "symbol",
@@ -45,9 +45,6 @@
   "functions": [
     {
       "name": "getSymbol",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -57,9 +54,6 @@
     },
     {
       "name": "getName",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -69,9 +63,6 @@
     },
     {
       "name": "getDecimals",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -81,9 +72,6 @@
     },
     {
       "name": "getTotalSupply",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -93,9 +81,6 @@
     },
     {
       "name": "balance",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
@@ -105,9 +90,6 @@
     },
     {
       "name": "withdraw",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": true,
-      "isPublic": true,
       "paramNames": [
         "amount"
       ],

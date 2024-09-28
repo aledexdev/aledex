@@ -1,8 +1,8 @@
 {
-  "version": "v2.12.0",
+  "version": "v3.6.6",
   "name": "FeeCollectorPerTokenPairImpl",
-  "bytecode": "020415402d4041405801010202000ab3ce014113107b1600b2ce011601aa01020202000cb40c0dce0001024513107b1600ce011601ab01020101000ab40c0dce0001024513107b1600b001000000000cb40c0dce0001024513107b0c0cce010112",
-  "codeHash": "854934781b951bef0fe2035d06ef61bc11021157d31f464ac25364f5ef600c53",
+  "bytecode": "02041a40374050406c01010202000bd300f3deccb3ce014113107b1600b2ce011601aa01020202000dd3f1ab4760b40c0dce0001024513107b1600ce011601ab01020101000bd320f98f62b40c0dce0001024513107b1600b001000000000dd3f2c71c4bb40c0dce0001024513107b0c0cce010112",
+  "codeHash": "72704dd7e78942d8dda9e78be879e306e40dfd0dac11adabbaf717a4306519f7",
   "fieldsSig": {
     "names": [
       "tokenPairFactory",
@@ -21,9 +21,6 @@
   "functions": [
     {
       "name": "collectFee",
-      "usePreapprovedAssets": true,
-      "useAssetsInContract": true,
-      "isPublic": true,
       "paramNames": [
         "from",
         "amount"
@@ -40,9 +37,6 @@
     },
     {
       "name": "withdraw",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": true,
-      "isPublic": true,
       "paramNames": [
         "to",
         "amount"
@@ -59,9 +53,6 @@
     },
     {
       "name": "destroy",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": true,
-      "isPublic": true,
       "paramNames": [
         "to"
       ],
@@ -75,9 +66,6 @@
     },
     {
       "name": "collectFeeManually",
-      "usePreapprovedAssets": false,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],

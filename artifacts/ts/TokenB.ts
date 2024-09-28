@@ -21,10 +21,14 @@ import {
   callMethod,
   multicallMethods,
   fetchContractState,
+  Asset,
   ContractInstance,
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
   addStdIdToFields,
   encodeContractFields,
 } from "@alephium/web3";
@@ -66,6 +70,10 @@ export namespace TokenBTypes {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
     };
+    withdraw: {
+      params: CallContractParams<{ amount: bigint }>;
+      result: CallContractResult<null>;
+    };
   }
   export type CallMethodParams<T extends keyof CallMethodTable> =
     CallMethodTable[T]["params"];
@@ -79,6 +87,40 @@ export namespace TokenBTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+  export type MulticallReturnType<Callss extends MultiCallParams[]> = {
+    [index in keyof Callss]: MultiCallResults<Callss[index]>;
+  };
+
+  export interface SignExecuteMethodTable {
+    getSymbol: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getName: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getDecimals: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getTotalSupply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    balance: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    withdraw: {
+      params: SignExecuteContractMethodParams<{ amount: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
@@ -90,12 +132,8 @@ class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
     );
   }
 
-  getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as TokenBTypes.Fields;
-  }
-
   eventIndex = { Withdraw: 0 };
-  consts = { ErrorCodes: { InvalidWithdrawAmount: BigInt(0) } };
+  consts = { ErrorCodes: { InvalidWithdrawAmount: BigInt("0") } };
 
   at(address: string): TokenBInstance {
     return new TokenBInstance(address);
@@ -108,7 +146,7 @@ class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getSymbol", params);
+      return testMethod(this, "getSymbol", params, getContractByCodeHash);
     },
     getName: async (
       params: Omit<
@@ -116,7 +154,7 @@ class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getName", params);
+      return testMethod(this, "getName", params, getContractByCodeHash);
     },
     getDecimals: async (
       params: Omit<
@@ -124,7 +162,7 @@ class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getDecimals", params);
+      return testMethod(this, "getDecimals", params, getContractByCodeHash);
     },
     getTotalSupply: async (
       params: Omit<
@@ -132,7 +170,7 @@ class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getTotalSupply", params);
+      return testMethod(this, "getTotalSupply", params, getContractByCodeHash);
     },
     balance: async (
       params: Omit<
@@ -140,7 +178,7 @@ class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "balance", params);
+      return testMethod(this, "balance", params, getContractByCodeHash);
     },
     withdraw: async (
       params: TestContractParamsWithoutMaps<
@@ -148,17 +186,25 @@ class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "withdraw", params);
+      return testMethod(this, "withdraw", params, getContractByCodeHash);
     },
   };
+
+  stateForTest(
+    initFields: TokenBTypes.Fields,
+    asset?: Asset,
+    address?: string
+  ) {
+    return this.stateForTest_(initFields, asset, address, undefined);
+  }
 }
 
 // Use this object to test and deploy the contract
 export const TokenB = new Factory(
   Contract.fromJson(
     TokenBContractJson,
-    "=20-2+70=101+3a0007e02=1+75468652063757272656e742062616c616e63652069732000=64",
-    "47132cc96e81d4e8c16918306af28ee0bf433ca933dacec0faad4ad65ea733e1",
+    "=20-2+7a=111-1+4=10+a0007e02175468652063757272656e742062616c616e63652069732000=64",
+    "ccaaa416df536a80a2ad67d961654823d45740b70e99e7e6e07473d8efaddddd",
     []
   )
 );
@@ -190,7 +236,7 @@ export class TokenBInstance extends ContractInstance {
     );
   }
 
-  methods = {
+  view = {
     getSymbol: async (
       params?: TokenBTypes.CallMethodParams<"getSymbol">
     ): Promise<TokenBTypes.CallMethodResult<"getSymbol">> => {
@@ -246,16 +292,60 @@ export class TokenBInstance extends ContractInstance {
         getContractByCodeHash
       );
     },
+    withdraw: async (
+      params: TokenBTypes.CallMethodParams<"withdraw">
+    ): Promise<TokenBTypes.CallMethodResult<"withdraw">> => {
+      return callMethod(
+        TokenB,
+        this,
+        "withdraw",
+        params,
+        getContractByCodeHash
+      );
+    },
   };
 
-  async multicall<Calls extends TokenBTypes.MultiCallParams>(
-    calls: Calls
-  ): Promise<TokenBTypes.MultiCallResults<Calls>> {
+  transact = {
+    getSymbol: async (
+      params: TokenBTypes.SignExecuteMethodParams<"getSymbol">
+    ): Promise<TokenBTypes.SignExecuteMethodResult<"getSymbol">> => {
+      return signExecuteMethod(TokenB, this, "getSymbol", params);
+    },
+    getName: async (
+      params: TokenBTypes.SignExecuteMethodParams<"getName">
+    ): Promise<TokenBTypes.SignExecuteMethodResult<"getName">> => {
+      return signExecuteMethod(TokenB, this, "getName", params);
+    },
+    getDecimals: async (
+      params: TokenBTypes.SignExecuteMethodParams<"getDecimals">
+    ): Promise<TokenBTypes.SignExecuteMethodResult<"getDecimals">> => {
+      return signExecuteMethod(TokenB, this, "getDecimals", params);
+    },
+    getTotalSupply: async (
+      params: TokenBTypes.SignExecuteMethodParams<"getTotalSupply">
+    ): Promise<TokenBTypes.SignExecuteMethodResult<"getTotalSupply">> => {
+      return signExecuteMethod(TokenB, this, "getTotalSupply", params);
+    },
+    balance: async (
+      params: TokenBTypes.SignExecuteMethodParams<"balance">
+    ): Promise<TokenBTypes.SignExecuteMethodResult<"balance">> => {
+      return signExecuteMethod(TokenB, this, "balance", params);
+    },
+    withdraw: async (
+      params: TokenBTypes.SignExecuteMethodParams<"withdraw">
+    ): Promise<TokenBTypes.SignExecuteMethodResult<"withdraw">> => {
+      return signExecuteMethod(TokenB, this, "withdraw", params);
+    },
+  };
+
+  async multicall<Callss extends TokenBTypes.MultiCallParams[]>(
+    ...callss: Callss
+  ): Promise<TokenBTypes.MulticallReturnType<Callss>> {
     return (await multicallMethods(
       TokenB,
       this,
-      calls,
+      callss,
       getContractByCodeHash
-    )) as TokenBTypes.MultiCallResults<Calls>;
+    )) as TokenBTypes.MulticallReturnType<Callss>;
   }
 }

@@ -1,5 +1,5 @@
 {
-  "version": "v2.12.0",
+  "version": "v3.6.6",
   "name": "Burn",
   "bytecodeTemplate": "0101030000000c{1}{0}{2}a3{1}{2}0e0e{0}01101818",
   "fieldsSig": {
@@ -22,9 +22,6 @@
   "functions": [
     {
       "name": "main",
-      "usePreapprovedAssets": true,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],

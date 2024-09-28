@@ -1,223 +1,182 @@
 {
-  "fullNodeVersion": "v2.12.0",
+  "fullNodeVersion": "v3.6.6",
   "compilerOptionsUsed": {
     "ignoreUnusedConstantsWarnings": false,
     "ignoreUnusedVariablesWarnings": false,
     "ignoreUnusedFieldsWarnings": false,
     "ignoreUnusedPrivateFunctionsWarnings": false,
     "ignoreUpdateFieldsCheckWarnings": false,
-    "ignoreCheckExternalCallerWarnings": false
+    "ignoreCheckExternalCallerWarnings": false,
+    "ignoreUnusedFunctionReturnWarnings": false
   },
   "infos": {
     "AddLiquidity": {
       "sourceFile": "scripts/add_liquidity.ral",
       "sourceCodeHash": "ae7c7a47ec7728436f5b56c039f277705fe3a71e64709d6ba40d8d802e3f6fbe",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "Burn": {
       "sourceFile": "scripts/burn.ral",
       "sourceCodeHash": "39eaefd397db97426daccd1e55bca54faa1a1e4a98fc2c699ce7b2e3ca6148cd",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "CollectFee": {
       "sourceFile": "scripts/collect_fee.ral",
       "sourceCodeHash": "1bf50ae9e84e3a698bf955f0ce7bfb14d2b05ac250255b7e0712dc523b6e44dc",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "Constants": {
-      "sourceFile": "constants.ral",
-      "sourceCodeHash": "de716344afeac3e83450b8a8b0a0a9e97f056cd95d4b6e29476ddb93960c8140",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "CreatePair": {
       "sourceFile": "scripts/create_pair.ral",
       "sourceCodeHash": "27d25c96dc9797d46e427721f5fa8803adb9e35305f9895dce09f9ee68e6e811",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "EnableFeeCollector": {
       "sourceFile": "scripts/enable_fee_collector.ral",
       "sourceCodeHash": "d910bff218027c5b1f43bcafcb53a11213f5fff26be50f3cda85c5484b4d8888",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "ExampleOracleSimple": {
       "sourceFile": "examples/example_oracle_simple.ral",
       "sourceCodeHash": "cf326717bf10e2008847af85dca9e3af7b7db672c49c25c6d2337912a0177d6e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "52a275cfc409ff8fce483c7f9af7242922b40286e1e3174a129476a459dc67ac",
-      "warnings": []
+      "codeHashDebug": "c5368e7c62fe29875bcc0f689510a7c917a200d37d4b1f02e0e857391419e85b"
     },
     "FeeCollectorFactory": {
       "sourceFile": "fee_collector_factory.ral",
       "sourceCodeHash": "dbdcabe131650b1315fdf3216f7345971a1fcce2ffe6414f4384bbb07c56339d",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "FeeCollectorFactoryImpl": {
       "sourceFile": "examples/fee_collector_factory_impl.ral",
       "sourceCodeHash": "dcc32c25db16e095988ccf690020bedf17f1ca4ff5cb606c3acf14d8a800d2d4",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "966f75cddefe774a87dbf778012f4f3f494b3a860f4c975d0c5262a1be185d49",
-      "warnings": []
+      "codeHashDebug": "e87f8e9977e4744dec8127e83a2ce2ed19510a0f5f4a1c32def3eee32986325f"
     },
     "FeeCollectorPerTokenPair": {
       "sourceFile": "fee_collector_per_token_pair.ral",
       "sourceCodeHash": "5216b65256a0c226981db05459321c7a56add721c3ed1506613b07283724fc4f",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "FeeCollectorPerTokenPairImpl": {
       "sourceFile": "examples/fee_collector_per_token_pair_impl.ral",
       "sourceCodeHash": "28b367b4effcc1a375a4ca90983abbba37ac8899fddbdddb2997960b4222b001",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "854934781b951bef0fe2035d06ef61bc11021157d31f464ac25364f5ef600c53",
-      "warnings": []
+      "codeHashDebug": "72704dd7e78942d8dda9e78be879e306e40dfd0dac11adabbaf717a4306519f7"
     },
     "FullMath": {
       "sourceFile": "examples/full_math.ral",
       "sourceCodeHash": "0adace894f54a4ede30f2b22bcc000f118f15d9e0dd8c432a3dc42739e5b5343",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "FullMathTest": {
       "sourceFile": "examples/full_math_test.ral",
       "sourceCodeHash": "0e2e55075a2b663409743948d49459826e8e8ebdd0c881cb1fefd8d11686cfe5",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "d6834220b59d306adb6cd548433f9e1ab4f20c155cad9c80ef89be27cb82a286",
-      "warnings": []
+      "codeHashDebug": "4e6bd23542804a31c9fdc85b4a0065857c11fcd0b7a40a7ce2c66558001e2040"
     },
     "IFungibleToken": {
       "sourceFile": "../node_modules/@alephium/web3/std/fungible_token_interface.ral",
-      "sourceCodeHash": "6809cb06fb20fa7edf529461998beeebd12b1636d439612cca2f84214dbf4a20",
+      "sourceCodeHash": "62910bf11e1eeb6cb2fd468626ff606a9b06306b2b81590c3b10f6deb5966bde",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "Math": {
       "sourceFile": "math.ral",
       "sourceCodeHash": "4be2abb3b39ed86d4714b9459e40c2050b3593601ed9e51db97f2f1a95d5129a",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "Mint": {
       "sourceFile": "scripts/mint.ral",
       "sourceCodeHash": "ff0941160f5aa702cb5c1c16af60c6251051dba5129cb3e3911376ec1084edbb",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "OracleErrors": {
-      "sourceFile": "examples/errors.ral",
-      "sourceCodeHash": "b1f9a6df0a3ea0aabe28257efbcc0aecaafefc905f2b0bc6d7baafb6adff880d",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "RemoveLiquidity": {
       "sourceFile": "scripts/remove_liquidity.ral",
       "sourceCodeHash": "a37e6c625f753ee67a3ac20bd4d71d19985d1a34381acf8833ea2a193378eb2e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "Router": {
       "sourceFile": "router.ral",
       "sourceCodeHash": "4c0e687cbed647272599f01d782b6ad12a0a535cca478900fa9239ca77110073",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "e5cda4b9332f133770686c294e88896ea2d8c9991014a59f78e15ffb316987ce",
-      "warnings": []
+      "codeHashDebug": "5006a5a8e56464cb6a36ca7c6e7bef95b08bcc1cd8b190b0197d10ef531e203b"
     },
     "SetFeeCollectorFactory": {
       "sourceFile": "scripts/set_fee_collector_factory.ral",
       "sourceCodeHash": "44709be4a8a58f2dbbbf9d8bb8b09c9654e3ef14a177fe44fdc451c072ba588d",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "Swap": {
       "sourceFile": "scripts/swap.ral",
       "sourceCodeHash": "d84c3a3bb054954d9023b4b02884659c126684fba2984ef944ab8aec9eb76416",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SwapMaxIn": {
       "sourceFile": "scripts/swap_max_in.ral",
       "sourceCodeHash": "91c41026f47cf9d75e56b00b24925031ad271ef30ad1717430d05835480b0aa5",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "SwapMinOut": {
       "sourceFile": "scripts/swap_min_out.ral",
       "sourceCodeHash": "846256348cfa6d306cacffa94c8c0108faa85d50c4a9e28b163c63be6ca26a63",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "TokenA": {
       "sourceFile": "examples/token_a.ral",
       "sourceCodeHash": "9a69ff984c759d72c9f2f4cb01f3475cde22bfb2311c140c2683cc91b5c053c7",
-      "bytecodeDebugPatch": "=20-2+70=101+3a0007e02=1+75468652063757272656e742062616c616e63652069732000=64",
-      "codeHashDebug": "47132cc96e81d4e8c16918306af28ee0bf433ca933dacec0faad4ad65ea733e1",
-      "warnings": []
+      "bytecodeDebugPatch": "=20-2+7a=111-1+4=10+a0007e02175468652063757272656e742062616c616e63652069732000=64",
+      "codeHashDebug": "ccaaa416df536a80a2ad67d961654823d45740b70e99e7e6e07473d8efaddddd"
     },
     "TokenB": {
       "sourceFile": "examples/token_b.ral",
       "sourceCodeHash": "f5d0262667992c933eb27df46d6f0ed30d211f7a4d9bc2d8edb95f2d772d9ebd",
-      "bytecodeDebugPatch": "=20-2+70=101+3a0007e02=1+75468652063757272656e742062616c616e63652069732000=64",
-      "codeHashDebug": "47132cc96e81d4e8c16918306af28ee0bf433ca933dacec0faad4ad65ea733e1",
-      "warnings": []
+      "bytecodeDebugPatch": "=20-2+7a=111-1+4=10+a0007e02175468652063757272656e742062616c616e63652069732000=64",
+      "codeHashDebug": "ccaaa416df536a80a2ad67d961654823d45740b70e99e7e6e07473d8efaddddd"
     },
     "TokenFaucet": {
       "sourceFile": "token.ral",
       "sourceCodeHash": "b291b15a4801ed145ef0aebe7b7b4258ddb9274a87724a13d667c986fcacfbfa",
-      "bytecodeDebugPatch": "=20-2+6b=101+3a0007e02=1+75468652063757272656e742062616c616e63652069732000=54",
-      "codeHashDebug": "b65799d5d13c25a3ea0013e48712138315f4fba3a827ab67be16a66d6700db03",
-      "warnings": []
+      "bytecodeDebugPatch": "=20+7=1-1=111-1+4=10+a0007e02175468652063757272656e742062616c616e63652069732000=54",
+      "codeHashDebug": "8707ae954b4c5345d2ba1f974f2d9fb49ab1a6c42501add505f14a1ef07b50bc"
     },
     "TokenPair": {
       "sourceFile": "token_pair.ral",
       "sourceCodeHash": "9851c21160f352e66f757b70a1079626f35cae0f392b4fb5a616e50f213f9c81",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "0ba23e4d958bc08a84958516f398b18390a393e91d4952b9816864565388a596",
-      "warnings": []
+      "codeHashDebug": "9671232e5ade9debbd4e44e01715c881bb7e6920e8efd7c121defbcc920aeba2"
     },
     "TokenPairFactory": {
       "sourceFile": "token_pair_factory.ral",
       "sourceCodeHash": "9f3ed84a923d27bd57316e2f11c6eed4fb98822e5f68b57ee99e48c97ac3a207",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "44144899a2b71465a80654889afa8a2bf4a8f3cd0f30ad1880d2ffc7c12ad18b",
-      "warnings": []
+      "codeHashDebug": "65dbcbdf27caaa4f82a0defa5c6bfce12912e5f10c4542c7072f65fe62c5ef5c"
     },
     "Withdraw": {
       "sourceFile": "withdraw.ral",
       "sourceCodeHash": "52423580f02f5aab7050bfb9a14b497ea4bdcb10b3444483650f3dad8e0e5330",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "WithdrawFees": {
       "sourceFile": "scripts/withdraw_fees.ral",
       "sourceCodeHash": "b39221d612f9ce7ff368499e69727ad72baa4c3b5ae29c54a0c353c406b79e16",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     }
   }
 }
