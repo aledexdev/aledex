@@ -18,6 +18,7 @@ import { default as CollectFeeScriptJson } from "../scripts/CollectFee.ral.json"
 import { default as CreatePairScriptJson } from "../scripts/CreatePair.ral.json";
 import { default as EnableFeeCollectorScriptJson } from "../scripts/EnableFeeCollector.ral.json";
 import { default as MintScriptJson } from "../scripts/Mint.ral.json";
+import { default as MintTestTokenScriptJson } from "../scripts/MintTestToken.ral.json";
 import { default as RemoveLiquidityScriptJson } from "../scripts/RemoveLiquidity.ral.json";
 import { default as SetFeeCollectorFactoryScriptJson } from "../scripts/SetFeeCollectorFactory.ral.json";
 import { default as SwapScriptJson } from "../scripts/Swap.ral.json";
@@ -70,6 +71,11 @@ export const Mint = new ExecutableScript<{
   amount0: bigint;
   amount1: bigint;
 }>(Script.fromJson(MintScriptJson, "", []), getContractByCodeHash);
+
+export const MintTestToken = new ExecutableScript<{
+  testToken: HexString;
+  amount: bigint;
+}>(Script.fromJson(MintTestTokenScriptJson, "", []), getContractByCodeHash);
 
 export const RemoveLiquidity = new ExecutableScript<{
   sender: Address;

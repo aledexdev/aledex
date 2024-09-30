@@ -7,6 +7,7 @@ export * from "./FeeCollectorFactoryImpl";
 export * from "./FeeCollectorPerTokenPairImpl";
 export * from "./FullMathTest";
 export * from "./Router";
+export * from "./TestToken";
 export * from "./TokenA";
 export * from "./TokenB";
 export * from "./TokenFaucet";

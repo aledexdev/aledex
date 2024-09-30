@@ -100,6 +100,12 @@
       "bytecodeDebugPatch": "",
       "codeHashDebug": ""
     },
+    "MintTestToken": {
+      "sourceFile": "scripts/mint_test_token.ral",
+      "sourceCodeHash": "dda83d8eecef6cef177e8362fbc074d2ba7a45c47181dd196c1a2d056554551b",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": ""
+    },
     "RemoveLiquidity": {
       "sourceFile": "scripts/remove_liquidity.ral",
       "sourceCodeHash": "a37e6c625f753ee67a3ac20bd4d71d19985d1a34381acf8833ea2a193378eb2e",
@@ -135,6 +141,12 @@
       "sourceCodeHash": "846256348cfa6d306cacffa94c8c0108faa85d50c4a9e28b163c63be6ca26a63",
       "bytecodeDebugPatch": "",
       "codeHashDebug": ""
+    },
+    "TestToken": {
+      "sourceFile": "test_token.ral",
+      "sourceCodeHash": "b5413b0c6f56f038bb2ea886ae3dfbc636e707cbaa70a26eb415d9c1b7d4e850",
+      "bytecodeDebugPatch": "",
+      "codeHashDebug": "c0bb0f994be5b8cf97df40568e5c1472178e007d718e9deed02f53d9db216f86"
     },
     "TokenA": {
       "sourceFile": "examples/token_a.ral",
