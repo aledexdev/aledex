@@ -21,10 +21,14 @@ import {
   callMethod,
   multicallMethods,
   fetchContractState,
+  Asset,
   ContractInstance,
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
   addStdIdToFields,
   encodeContractFields,
 } from "@alephium/web3";
@@ -39,6 +43,66 @@ export namespace FeeCollectorPerTokenPairImplTypes {
   };
 
   export type State = ContractState<Fields>;
+
+  export interface CallMethodTable {
+    collectFee: {
+      params: CallContractParams<{ from: Address; amount: bigint }>;
+      result: CallContractResult<null>;
+    };
+    withdraw: {
+      params: CallContractParams<{ to: Address; amount: bigint }>;
+      result: CallContractResult<null>;
+    };
+    destroy: {
+      params: CallContractParams<{ to: Address }>;
+      result: CallContractResult<null>;
+    };
+    collectFeeManually: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
+  }
+  export type CallMethodParams<T extends keyof CallMethodTable> =
+    CallMethodTable[T]["params"];
+  export type CallMethodResult<T extends keyof CallMethodTable> =
+    CallMethodTable[T]["result"];
+  export type MultiCallParams = Partial<{
+    [Name in keyof CallMethodTable]: CallMethodTable[Name]["params"];
+  }>;
+  export type MultiCallResults<T extends MultiCallParams> = {
+    [MaybeName in keyof T]: MaybeName extends keyof CallMethodTable
+      ? CallMethodTable[MaybeName]["result"]
+      : undefined;
+  };
+  export type MulticallReturnType<Callss extends MultiCallParams[]> = {
+    [index in keyof Callss]: MultiCallResults<Callss[index]>;
+  };
+
+  export interface SignExecuteMethodTable {
+    collectFee: {
+      params: SignExecuteContractMethodParams<{
+        from: Address;
+        amount: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    withdraw: {
+      params: SignExecuteContractMethodParams<{ to: Address; amount: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    destroy: {
+      params: SignExecuteContractMethodParams<{ to: Address }>;
+      result: SignExecuteScriptTxResult;
+    };
+    collectFeeManually: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<
@@ -53,11 +117,7 @@ class Factory extends ContractFactory<
     );
   }
 
-  getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as FeeCollectorPerTokenPairImplTypes.Fields;
-  }
-
-  consts = { ErrorCodes: { InvalidCaller: BigInt(16) } };
+  consts = { ErrorCodes: { InvalidCaller: BigInt("16") } };
 
   at(address: string): FeeCollectorPerTokenPairImplInstance {
     return new FeeCollectorPerTokenPairImplInstance(address);
@@ -70,7 +130,7 @@ class Factory extends ContractFactory<
         { from: Address; amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "collectFee", params);
+      return testMethod(this, "collectFee", params, getContractByCodeHash);
     },
     withdraw: async (
       params: TestContractParamsWithoutMaps<
@@ -78,7 +138,7 @@ class Factory extends ContractFactory<
         { to: Address; amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "withdraw", params);
+      return testMethod(this, "withdraw", params, getContractByCodeHash);
     },
     destroy: async (
       params: TestContractParamsWithoutMaps<
@@ -86,7 +146,7 @@ class Factory extends ContractFactory<
         { to: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "destroy", params);
+      return testMethod(this, "destroy", params, getContractByCodeHash);
     },
     collectFeeManually: async (
       params: Omit<
@@ -97,9 +157,22 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "collectFeeManually", params);
+      return testMethod(
+        this,
+        "collectFeeManually",
+        params,
+        getContractByCodeHash
+      );
     },
   };
+
+  stateForTest(
+    initFields: FeeCollectorPerTokenPairImplTypes.Fields,
+    asset?: Asset,
+    address?: string
+  ) {
+    return this.stateForTest_(initFields, asset, address, undefined);
+  }
 }
 
 // Use this object to test and deploy the contract
@@ -107,7 +180,7 @@ export const FeeCollectorPerTokenPairImpl = new Factory(
   Contract.fromJson(
     FeeCollectorPerTokenPairImplContractJson,
     "",
-    "854934781b951bef0fe2035d06ef61bc11021157d31f464ac25364f5ef600c53",
+    "72704dd7e78942d8dda9e78be879e306e40dfd0dac11adabbaf717a4306519f7",
     []
   )
 );
@@ -121,4 +194,110 @@ export class FeeCollectorPerTokenPairImplInstance extends ContractInstance {
   async fetchState(): Promise<FeeCollectorPerTokenPairImplTypes.State> {
     return fetchContractState(FeeCollectorPerTokenPairImpl, this);
   }
+
+  view = {
+    collectFee: async (
+      params: FeeCollectorPerTokenPairImplTypes.CallMethodParams<"collectFee">
+    ): Promise<
+      FeeCollectorPerTokenPairImplTypes.CallMethodResult<"collectFee">
+    > => {
+      return callMethod(
+        FeeCollectorPerTokenPairImpl,
+        this,
+        "collectFee",
+        params,
+        getContractByCodeHash
+      );
+    },
+    withdraw: async (
+      params: FeeCollectorPerTokenPairImplTypes.CallMethodParams<"withdraw">
+    ): Promise<
+      FeeCollectorPerTokenPairImplTypes.CallMethodResult<"withdraw">
+    > => {
+      return callMethod(
+        FeeCollectorPerTokenPairImpl,
+        this,
+        "withdraw",
+        params,
+        getContractByCodeHash
+      );
+    },
+    destroy: async (
+      params: FeeCollectorPerTokenPairImplTypes.CallMethodParams<"destroy">
+    ): Promise<
+      FeeCollectorPerTokenPairImplTypes.CallMethodResult<"destroy">
+    > => {
+      return callMethod(
+        FeeCollectorPerTokenPairImpl,
+        this,
+        "destroy",
+        params,
+        getContractByCodeHash
+      );
+    },
+    collectFeeManually: async (
+      params?: FeeCollectorPerTokenPairImplTypes.CallMethodParams<"collectFeeManually">
+    ): Promise<
+      FeeCollectorPerTokenPairImplTypes.CallMethodResult<"collectFeeManually">
+    > => {
+      return callMethod(
+        FeeCollectorPerTokenPairImpl,
+        this,
+        "collectFeeManually",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+  };
+
+  transact = {
+    collectFee: async (
+      params: FeeCollectorPerTokenPairImplTypes.SignExecuteMethodParams<"collectFee">
+    ): Promise<
+      FeeCollectorPerTokenPairImplTypes.SignExecuteMethodResult<"collectFee">
+    > => {
+      return signExecuteMethod(
+        FeeCollectorPerTokenPairImpl,
+        this,
+        "collectFee",
+        params
+      );
+    },
+    withdraw: async (
+      params: FeeCollectorPerTokenPairImplTypes.SignExecuteMethodParams<"withdraw">
+    ): Promise<
+      FeeCollectorPerTokenPairImplTypes.SignExecuteMethodResult<"withdraw">
+    > => {
+      return signExecuteMethod(
+        FeeCollectorPerTokenPairImpl,
+        this,
+        "withdraw",
+        params
+      );
+    },
+    destroy: async (
+      params: FeeCollectorPerTokenPairImplTypes.SignExecuteMethodParams<"destroy">
+    ): Promise<
+      FeeCollectorPerTokenPairImplTypes.SignExecuteMethodResult<"destroy">
+    > => {
+      return signExecuteMethod(
+        FeeCollectorPerTokenPairImpl,
+        this,
+        "destroy",
+        params
+      );
+    },
+    collectFeeManually: async (
+      params: FeeCollectorPerTokenPairImplTypes.SignExecuteMethodParams<"collectFeeManually">
+    ): Promise<
+      FeeCollectorPerTokenPairImplTypes.SignExecuteMethodResult<"collectFeeManually">
+    > => {
+      return signExecuteMethod(
+        FeeCollectorPerTokenPairImpl,
+        this,
+        "collectFeeManually",
+        params
+      );
+    },
+  };
 }

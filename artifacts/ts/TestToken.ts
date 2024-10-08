@@ -32,22 +32,21 @@ import {
   addStdIdToFields,
   encodeContractFields,
 } from "@alephium/web3";
-import { default as TokenBContractJson } from "../examples/TokenB.ral.json";
+import { default as TestTokenContractJson } from "../TestToken.ral.json";
 import { getContractByCodeHash } from "./contracts";
 
 // Custom types for the contract
-export namespace TokenBTypes {
+export namespace TestTokenTypes {
   export type Fields = {
     symbol: HexString;
     name: HexString;
     decimals: bigint;
     supply: bigint;
-    balance: bigint;
   };
 
   export type State = ContractState<Fields>;
 
-  export type WithdrawEvent = ContractEvent<{ to: Address; amount: bigint }>;
+  export type MintEvent = ContractEvent<{ to: Address; amount: bigint }>;
 
   export interface CallMethodTable {
     getSymbol: {
@@ -66,11 +65,7 @@ export namespace TokenBTypes {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
     };
-    balance: {
-      params: Omit<CallContractParams<{}>, "args">;
-      result: CallContractResult<bigint>;
-    };
-    withdraw: {
+    mint: {
       params: CallContractParams<{ amount: bigint }>;
       result: CallContractResult<null>;
     };
@@ -108,11 +103,7 @@ export namespace TokenBTypes {
       params: Omit<SignExecuteContractMethodParams<{}>, "args">;
       result: SignExecuteScriptTxResult;
     };
-    balance: {
-      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
-      result: SignExecuteScriptTxResult;
-    };
-    withdraw: {
+    mint: {
       params: SignExecuteContractMethodParams<{ amount: bigint }>;
       result: SignExecuteScriptTxResult;
     };
@@ -123,8 +114,11 @@ export namespace TokenBTypes {
     SignExecuteMethodTable[T]["result"];
 }
 
-class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
-  encodeFields(fields: TokenBTypes.Fields) {
+class Factory extends ContractFactory<
+  TestTokenInstance,
+  TestTokenTypes.Fields
+> {
+  encodeFields(fields: TestTokenTypes.Fields) {
     return encodeContractFields(
       addStdIdToFields(this.contract, fields),
       this.contract.fieldsSig,
@@ -132,17 +126,17 @@ class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
     );
   }
 
-  eventIndex = { Withdraw: 0 };
-  consts = { ErrorCodes: { InvalidWithdrawAmount: BigInt("0") } };
+  eventIndex = { Mint: 0 };
+  consts = { ErrorCodes: { InvalidMintAmount: BigInt("0") } };
 
-  at(address: string): TokenBInstance {
-    return new TokenBInstance(address);
+  at(address: string): TestTokenInstance {
+    return new TestTokenInstance(address);
   }
 
   tests = {
     getSymbol: async (
       params: Omit<
-        TestContractParamsWithoutMaps<TokenBTypes.Fields, never>,
+        TestContractParamsWithoutMaps<TestTokenTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -150,7 +144,7 @@ class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
     },
     getName: async (
       params: Omit<
-        TestContractParamsWithoutMaps<TokenBTypes.Fields, never>,
+        TestContractParamsWithoutMaps<TestTokenTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
@@ -158,7 +152,7 @@ class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
     },
     getDecimals: async (
       params: Omit<
-        TestContractParamsWithoutMaps<TokenBTypes.Fields, never>,
+        TestContractParamsWithoutMaps<TestTokenTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
@@ -166,32 +160,24 @@ class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
     },
     getTotalSupply: async (
       params: Omit<
-        TestContractParamsWithoutMaps<TokenBTypes.Fields, never>,
+        TestContractParamsWithoutMaps<TestTokenTypes.Fields, never>,
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
       return testMethod(this, "getTotalSupply", params, getContractByCodeHash);
     },
-    balance: async (
-      params: Omit<
-        TestContractParamsWithoutMaps<TokenBTypes.Fields, never>,
-        "testArgs"
-      >
-    ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "balance", params, getContractByCodeHash);
-    },
-    withdraw: async (
+    mint: async (
       params: TestContractParamsWithoutMaps<
-        TokenBTypes.Fields,
+        TestTokenTypes.Fields,
         { amount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "withdraw", params, getContractByCodeHash);
+      return testMethod(this, "mint", params, getContractByCodeHash);
     },
   };
 
   stateForTest(
-    initFields: TokenBTypes.Fields,
+    initFields: TestTokenTypes.Fields,
     asset?: Asset,
     address?: string
   ) {
@@ -200,48 +186,48 @@ class Factory extends ContractFactory<TokenBInstance, TokenBTypes.Fields> {
 }
 
 // Use this object to test and deploy the contract
-export const TokenB = new Factory(
+export const TestToken = new Factory(
   Contract.fromJson(
-    TokenBContractJson,
-    "=20-2+7a=111-1+4=10+a0007e02175468652063757272656e742062616c616e63652069732000=64",
-    "ccaaa416df536a80a2ad67d961654823d45740b70e99e7e6e07473d8efaddddd",
+    TestTokenContractJson,
+    "",
+    "c0bb0f994be5b8cf97df40568e5c1472178e007d718e9deed02f53d9db216f86",
     []
   )
 );
 
 // Use this class to interact with the blockchain
-export class TokenBInstance extends ContractInstance {
+export class TestTokenInstance extends ContractInstance {
   constructor(address: Address) {
     super(address);
   }
 
-  async fetchState(): Promise<TokenBTypes.State> {
-    return fetchContractState(TokenB, this);
+  async fetchState(): Promise<TestTokenTypes.State> {
+    return fetchContractState(TestToken, this);
   }
 
   async getContractEventsCurrentCount(): Promise<number> {
     return getContractEventsCurrentCount(this.address);
   }
 
-  subscribeWithdrawEvent(
-    options: EventSubscribeOptions<TokenBTypes.WithdrawEvent>,
+  subscribeMintEvent(
+    options: EventSubscribeOptions<TestTokenTypes.MintEvent>,
     fromCount?: number
   ): EventSubscription {
     return subscribeContractEvent(
-      TokenB.contract,
+      TestToken.contract,
       this,
       options,
-      "Withdraw",
+      "Mint",
       fromCount
     );
   }
 
   view = {
     getSymbol: async (
-      params?: TokenBTypes.CallMethodParams<"getSymbol">
-    ): Promise<TokenBTypes.CallMethodResult<"getSymbol">> => {
+      params?: TestTokenTypes.CallMethodParams<"getSymbol">
+    ): Promise<TestTokenTypes.CallMethodResult<"getSymbol">> => {
       return callMethod(
-        TokenB,
+        TestToken,
         this,
         "getSymbol",
         params === undefined ? {} : params,
@@ -249,10 +235,10 @@ export class TokenBInstance extends ContractInstance {
       );
     },
     getName: async (
-      params?: TokenBTypes.CallMethodParams<"getName">
-    ): Promise<TokenBTypes.CallMethodResult<"getName">> => {
+      params?: TestTokenTypes.CallMethodParams<"getName">
+    ): Promise<TestTokenTypes.CallMethodResult<"getName">> => {
       return callMethod(
-        TokenB,
+        TestToken,
         this,
         "getName",
         params === undefined ? {} : params,
@@ -260,10 +246,10 @@ export class TokenBInstance extends ContractInstance {
       );
     },
     getDecimals: async (
-      params?: TokenBTypes.CallMethodParams<"getDecimals">
-    ): Promise<TokenBTypes.CallMethodResult<"getDecimals">> => {
+      params?: TestTokenTypes.CallMethodParams<"getDecimals">
+    ): Promise<TestTokenTypes.CallMethodResult<"getDecimals">> => {
       return callMethod(
-        TokenB,
+        TestToken,
         this,
         "getDecimals",
         params === undefined ? {} : params,
@@ -271,81 +257,59 @@ export class TokenBInstance extends ContractInstance {
       );
     },
     getTotalSupply: async (
-      params?: TokenBTypes.CallMethodParams<"getTotalSupply">
-    ): Promise<TokenBTypes.CallMethodResult<"getTotalSupply">> => {
+      params?: TestTokenTypes.CallMethodParams<"getTotalSupply">
+    ): Promise<TestTokenTypes.CallMethodResult<"getTotalSupply">> => {
       return callMethod(
-        TokenB,
+        TestToken,
         this,
         "getTotalSupply",
         params === undefined ? {} : params,
         getContractByCodeHash
       );
     },
-    balance: async (
-      params?: TokenBTypes.CallMethodParams<"balance">
-    ): Promise<TokenBTypes.CallMethodResult<"balance">> => {
-      return callMethod(
-        TokenB,
-        this,
-        "balance",
-        params === undefined ? {} : params,
-        getContractByCodeHash
-      );
-    },
-    withdraw: async (
-      params: TokenBTypes.CallMethodParams<"withdraw">
-    ): Promise<TokenBTypes.CallMethodResult<"withdraw">> => {
-      return callMethod(
-        TokenB,
-        this,
-        "withdraw",
-        params,
-        getContractByCodeHash
-      );
+    mint: async (
+      params: TestTokenTypes.CallMethodParams<"mint">
+    ): Promise<TestTokenTypes.CallMethodResult<"mint">> => {
+      return callMethod(TestToken, this, "mint", params, getContractByCodeHash);
     },
   };
 
   transact = {
     getSymbol: async (
-      params: TokenBTypes.SignExecuteMethodParams<"getSymbol">
-    ): Promise<TokenBTypes.SignExecuteMethodResult<"getSymbol">> => {
-      return signExecuteMethod(TokenB, this, "getSymbol", params);
+      params: TestTokenTypes.SignExecuteMethodParams<"getSymbol">
+    ): Promise<TestTokenTypes.SignExecuteMethodResult<"getSymbol">> => {
+      return signExecuteMethod(TestToken, this, "getSymbol", params);
     },
     getName: async (
-      params: TokenBTypes.SignExecuteMethodParams<"getName">
-    ): Promise<TokenBTypes.SignExecuteMethodResult<"getName">> => {
-      return signExecuteMethod(TokenB, this, "getName", params);
+      params: TestTokenTypes.SignExecuteMethodParams<"getName">
+    ): Promise<TestTokenTypes.SignExecuteMethodResult<"getName">> => {
+      return signExecuteMethod(TestToken, this, "getName", params);
     },
     getDecimals: async (
-      params: TokenBTypes.SignExecuteMethodParams<"getDecimals">
-    ): Promise<TokenBTypes.SignExecuteMethodResult<"getDecimals">> => {
-      return signExecuteMethod(TokenB, this, "getDecimals", params);
+      params: TestTokenTypes.SignExecuteMethodParams<"getDecimals">
+    ): Promise<TestTokenTypes.SignExecuteMethodResult<"getDecimals">> => {
+      return signExecuteMethod(TestToken, this, "getDecimals", params);
     },
     getTotalSupply: async (
-      params: TokenBTypes.SignExecuteMethodParams<"getTotalSupply">
-    ): Promise<TokenBTypes.SignExecuteMethodResult<"getTotalSupply">> => {
-      return signExecuteMethod(TokenB, this, "getTotalSupply", params);
+      params: TestTokenTypes.SignExecuteMethodParams<"getTotalSupply">
+    ): Promise<TestTokenTypes.SignExecuteMethodResult<"getTotalSupply">> => {
+      return signExecuteMethod(TestToken, this, "getTotalSupply", params);
     },
-    balance: async (
-      params: TokenBTypes.SignExecuteMethodParams<"balance">
-    ): Promise<TokenBTypes.SignExecuteMethodResult<"balance">> => {
-      return signExecuteMethod(TokenB, this, "balance", params);
-    },
-    withdraw: async (
-      params: TokenBTypes.SignExecuteMethodParams<"withdraw">
-    ): Promise<TokenBTypes.SignExecuteMethodResult<"withdraw">> => {
-      return signExecuteMethod(TokenB, this, "withdraw", params);
+    mint: async (
+      params: TestTokenTypes.SignExecuteMethodParams<"mint">
+    ): Promise<TestTokenTypes.SignExecuteMethodResult<"mint">> => {
+      return signExecuteMethod(TestToken, this, "mint", params);
     },
   };
 
-  async multicall<Callss extends TokenBTypes.MultiCallParams[]>(
+  async multicall<Callss extends TestTokenTypes.MultiCallParams[]>(
     ...callss: Callss
-  ): Promise<TokenBTypes.MulticallReturnType<Callss>> {
+  ): Promise<TestTokenTypes.MulticallReturnType<Callss>> {
     return (await multicallMethods(
-      TokenB,
+      TestToken,
       this,
       callss,
       getContractByCodeHash
-    )) as TokenBTypes.MulticallReturnType<Callss>;
+    )) as TestTokenTypes.MulticallReturnType<Callss>;
   }
 }

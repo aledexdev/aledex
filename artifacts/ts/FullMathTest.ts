@@ -21,10 +21,14 @@ import {
   callMethod,
   multicallMethods,
   fetchContractState,
+  Asset,
   ContractInstance,
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
   addStdIdToFields,
   encodeContractFields,
 } from "@alephium/web3";
@@ -61,6 +65,35 @@ export namespace FullMathTestTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+  export type MulticallReturnType<Callss extends MultiCallParams[]> = {
+    [index in keyof Callss]: MultiCallResults<Callss[index]>;
+  };
+
+  export interface SignExecuteMethodTable {
+    fullMul: {
+      params: SignExecuteContractMethodParams<{ x: bigint; y: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    mulDiv: {
+      params: SignExecuteContractMethodParams<{
+        a: bigint;
+        b: bigint;
+        denominator: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    fraction: {
+      params: SignExecuteContractMethodParams<{
+        numerator: bigint;
+        denominator: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<FullMathTestInstance, {}> {
@@ -69,11 +102,11 @@ class Factory extends ContractFactory<FullMathTestInstance, {}> {
   }
 
   consts = {
-    Resolution: BigInt(112),
+    Resolution: BigInt("112"),
     ErrorCodes: {
-      FullDivOverflow: BigInt(0),
-      DivByZero: BigInt(1),
-      FractionOverflow: BigInt(2),
+      FullDivOverflow: BigInt("0"),
+      DivByZero: BigInt("1"),
+      FractionOverflow: BigInt("2"),
     },
   };
 
@@ -88,7 +121,7 @@ class Factory extends ContractFactory<FullMathTestInstance, {}> {
         "initialFields"
       >
     ): Promise<TestContractResultWithoutMaps<[bigint, bigint]>> => {
-      return testMethod(this, "fullMul", params);
+      return testMethod(this, "fullMul", params, getContractByCodeHash);
     },
     mulDiv: async (
       params: Omit<
@@ -99,7 +132,7 @@ class Factory extends ContractFactory<FullMathTestInstance, {}> {
         "initialFields"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "mulDiv", params);
+      return testMethod(this, "mulDiv", params, getContractByCodeHash);
     },
     fraction: async (
       params: Omit<
@@ -110,9 +143,13 @@ class Factory extends ContractFactory<FullMathTestInstance, {}> {
         "initialFields"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "fraction", params);
+      return testMethod(this, "fraction", params, getContractByCodeHash);
     },
   };
+
+  stateForTest(initFields: {}, asset?: Asset, address?: string) {
+    return this.stateForTest_(initFields, asset, address, undefined);
+  }
 }
 
 // Use this object to test and deploy the contract
@@ -120,7 +157,7 @@ export const FullMathTest = new Factory(
   Contract.fromJson(
     FullMathTestContractJson,
     "",
-    "d6834220b59d306adb6cd548433f9e1ab4f20c155cad9c80ef89be27cb82a286",
+    "4e6bd23542804a31c9fdc85b4a0065857c11fcd0b7a40a7ce2c66558001e2040",
     []
   )
 );
@@ -135,7 +172,7 @@ export class FullMathTestInstance extends ContractInstance {
     return fetchContractState(FullMathTest, this);
   }
 
-  methods = {
+  view = {
     fullMul: async (
       params: FullMathTestTypes.CallMethodParams<"fullMul">
     ): Promise<FullMathTestTypes.CallMethodResult<"fullMul">> => {
@@ -171,14 +208,32 @@ export class FullMathTestInstance extends ContractInstance {
     },
   };
 
-  async multicall<Calls extends FullMathTestTypes.MultiCallParams>(
-    calls: Calls
-  ): Promise<FullMathTestTypes.MultiCallResults<Calls>> {
+  transact = {
+    fullMul: async (
+      params: FullMathTestTypes.SignExecuteMethodParams<"fullMul">
+    ): Promise<FullMathTestTypes.SignExecuteMethodResult<"fullMul">> => {
+      return signExecuteMethod(FullMathTest, this, "fullMul", params);
+    },
+    mulDiv: async (
+      params: FullMathTestTypes.SignExecuteMethodParams<"mulDiv">
+    ): Promise<FullMathTestTypes.SignExecuteMethodResult<"mulDiv">> => {
+      return signExecuteMethod(FullMathTest, this, "mulDiv", params);
+    },
+    fraction: async (
+      params: FullMathTestTypes.SignExecuteMethodParams<"fraction">
+    ): Promise<FullMathTestTypes.SignExecuteMethodResult<"fraction">> => {
+      return signExecuteMethod(FullMathTest, this, "fraction", params);
+    },
+  };
+
+  async multicall<Callss extends FullMathTestTypes.MultiCallParams[]>(
+    ...callss: Callss
+  ): Promise<FullMathTestTypes.MulticallReturnType<Callss>> {
     return (await multicallMethods(
       FullMathTest,
       this,
-      calls,
+      callss,
       getContractByCodeHash
-    )) as FullMathTestTypes.MultiCallResults<Calls>;
+    )) as FullMathTestTypes.MulticallReturnType<Callss>;
   }
 }

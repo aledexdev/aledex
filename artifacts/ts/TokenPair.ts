@@ -21,10 +21,14 @@ import {
   callMethod,
   multicallMethods,
   fetchContractState,
+  Asset,
   ContractInstance,
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
   addStdIdToFields,
   encodeContractFields,
 } from "@alephium/web3";
@@ -95,6 +99,10 @@ export namespace TokenPairTypes {
       params: CallContractParams<{ y: bigint }>;
       result: CallContractResult<bigint>;
     };
+    setFeeCollectorId: {
+      params: CallContractParams<{ id: HexString }>;
+      result: CallContractResult<null>;
+    };
     getTokenPair: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<[HexString, HexString]>;
@@ -102,6 +110,10 @@ export namespace TokenPairTypes {
     getReserves: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<[bigint, bigint]>;
+    };
+    pairName_: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<HexString>;
     };
     getBlockTimeStampLast: {
       params: Omit<CallContractParams<{}>, "args">;
@@ -115,6 +127,14 @@ export namespace TokenPairTypes {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
     };
+    update: {
+      params: CallContractParams<{ newReserve0: bigint; newReserve1: bigint }>;
+      result: CallContractResult<null>;
+    };
+    mintFee: {
+      params: CallContractParams<{ reserve0_: bigint; reserve1_: bigint }>;
+      result: CallContractResult<[boolean, bigint]>;
+    };
     mint: {
       params: CallContractParams<{
         sender: Address;
@@ -126,6 +146,25 @@ export namespace TokenPairTypes {
     burn: {
       params: CallContractParams<{ sender: Address; liquidity: bigint }>;
       result: CallContractResult<[bigint, bigint]>;
+    };
+    swap: {
+      params: CallContractParams<{
+        sender: Address;
+        to: Address;
+        amount0In: bigint;
+        amount1In: bigint;
+        amount0Out: bigint;
+        amount1Out: bigint;
+      }>;
+      result: CallContractResult<null>;
+    };
+    collectFeeManually: {
+      params: Omit<CallContractParams<{}>, "args">;
+      result: CallContractResult<null>;
+    };
+    collectFeeAndUpdateKLast: {
+      params: CallContractParams<{ feeAmount: bigint }>;
+      result: CallContractResult<null>;
     };
   }
   export type CallMethodParams<T extends keyof CallMethodTable> =
@@ -140,6 +179,116 @@ export namespace TokenPairTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+  export type MulticallReturnType<Callss extends MultiCallParams[]> = {
+    [index in keyof Callss]: MultiCallResults<Callss[index]>;
+  };
+
+  export interface SignExecuteMethodTable {
+    getSymbol: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getName: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getDecimals: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getTotalSupply: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    uqdiv: {
+      params: SignExecuteContractMethodParams<{ a: bigint; b: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    sqrt: {
+      params: SignExecuteContractMethodParams<{ y: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+    setFeeCollectorId: {
+      params: SignExecuteContractMethodParams<{ id: HexString }>;
+      result: SignExecuteScriptTxResult;
+    };
+    getTokenPair: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getReserves: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    pairName_: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getBlockTimeStampLast: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getPrice0CumulativeLast: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getPrice1CumulativeLast: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    update: {
+      params: SignExecuteContractMethodParams<{
+        newReserve0: bigint;
+        newReserve1: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    mintFee: {
+      params: SignExecuteContractMethodParams<{
+        reserve0_: bigint;
+        reserve1_: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    mint: {
+      params: SignExecuteContractMethodParams<{
+        sender: Address;
+        amount0: bigint;
+        amount1: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    burn: {
+      params: SignExecuteContractMethodParams<{
+        sender: Address;
+        liquidity: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    swap: {
+      params: SignExecuteContractMethodParams<{
+        sender: Address;
+        to: Address;
+        amount0In: bigint;
+        amount1In: bigint;
+        amount0Out: bigint;
+        amount1Out: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    collectFeeManually: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    collectFeeAndUpdateKLast: {
+      params: SignExecuteContractMethodParams<{ feeAmount: bigint }>;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<
@@ -154,24 +303,20 @@ class Factory extends ContractFactory<
     );
   }
 
-  getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as TokenPairTypes.Fields;
-  }
-
   eventIndex = { Mint: 0, Burn: 1, Swap: 2 };
   consts = {
-    MINIMUM_LIQUIDITY: BigInt(1000),
+    MINIMUM_LIQUIDITY: BigInt("1000"),
     ErrorCodes: {
-      ReserveOverflow: BigInt(0),
-      InsufficientInitLiquidity: BigInt(1),
-      InsufficientLiquidityMinted: BigInt(2),
-      InsufficientLiquidityBurned: BigInt(3),
-      InvalidToAddress: BigInt(4),
-      InsufficientLiquidity: BigInt(5),
-      InvalidK: BigInt(8),
-      InsufficientOutputAmount: BigInt(9),
-      InvalidCaller: BigInt(16),
-      FeeCollectorNotEnabled: BigInt(17),
+      ReserveOverflow: BigInt("0"),
+      InsufficientInitLiquidity: BigInt("1"),
+      InsufficientLiquidityMinted: BigInt("2"),
+      InsufficientLiquidityBurned: BigInt("3"),
+      InvalidToAddress: BigInt("4"),
+      InsufficientLiquidity: BigInt("5"),
+      InvalidK: BigInt("8"),
+      InsufficientOutputAmount: BigInt("9"),
+      InvalidCaller: BigInt("16"),
+      FeeCollectorNotEnabled: BigInt("17"),
     },
   };
 
@@ -186,7 +331,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getSymbol", params);
+      return testMethod(this, "getSymbol", params, getContractByCodeHash);
     },
     getName: async (
       params: Omit<
@@ -194,7 +339,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "getName", params);
+      return testMethod(this, "getName", params, getContractByCodeHash);
     },
     getDecimals: async (
       params: Omit<
@@ -202,7 +347,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getDecimals", params);
+      return testMethod(this, "getDecimals", params, getContractByCodeHash);
     },
     getTotalSupply: async (
       params: Omit<
@@ -210,7 +355,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getTotalSupply", params);
+      return testMethod(this, "getTotalSupply", params, getContractByCodeHash);
     },
     uqdiv: async (
       params: TestContractParamsWithoutMaps<
@@ -218,7 +363,7 @@ class Factory extends ContractFactory<
         { a: bigint; b: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "uqdiv", params);
+      return testMethod(this, "uqdiv", params, getContractByCodeHash);
     },
     sqrt: async (
       params: TestContractParamsWithoutMaps<
@@ -226,7 +371,7 @@ class Factory extends ContractFactory<
         { y: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "sqrt", params);
+      return testMethod(this, "sqrt", params, getContractByCodeHash);
     },
     setFeeCollectorId: async (
       params: TestContractParamsWithoutMaps<
@@ -234,7 +379,12 @@ class Factory extends ContractFactory<
         { id: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "setFeeCollectorId", params);
+      return testMethod(
+        this,
+        "setFeeCollectorId",
+        params,
+        getContractByCodeHash
+      );
     },
     getTokenPair: async (
       params: Omit<
@@ -242,7 +392,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<[HexString, HexString]>> => {
-      return testMethod(this, "getTokenPair", params);
+      return testMethod(this, "getTokenPair", params, getContractByCodeHash);
     },
     getReserves: async (
       params: Omit<
@@ -250,7 +400,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<[bigint, bigint]>> => {
-      return testMethod(this, "getReserves", params);
+      return testMethod(this, "getReserves", params, getContractByCodeHash);
     },
     pairName_: async (
       params: Omit<
@@ -258,7 +408,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<HexString>> => {
-      return testMethod(this, "pairName_", params);
+      return testMethod(this, "pairName_", params, getContractByCodeHash);
     },
     getBlockTimeStampLast: async (
       params: Omit<
@@ -266,7 +416,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getBlockTimeStampLast", params);
+      return testMethod(
+        this,
+        "getBlockTimeStampLast",
+        params,
+        getContractByCodeHash
+      );
     },
     getPrice0CumulativeLast: async (
       params: Omit<
@@ -274,7 +429,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getPrice0CumulativeLast", params);
+      return testMethod(
+        this,
+        "getPrice0CumulativeLast",
+        params,
+        getContractByCodeHash
+      );
     },
     getPrice1CumulativeLast: async (
       params: Omit<
@@ -282,7 +442,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getPrice1CumulativeLast", params);
+      return testMethod(
+        this,
+        "getPrice1CumulativeLast",
+        params,
+        getContractByCodeHash
+      );
     },
     update: async (
       params: TestContractParamsWithoutMaps<
@@ -290,7 +455,7 @@ class Factory extends ContractFactory<
         { newReserve0: bigint; newReserve1: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "update", params);
+      return testMethod(this, "update", params, getContractByCodeHash);
     },
     mintFee: async (
       params: TestContractParamsWithoutMaps<
@@ -298,7 +463,7 @@ class Factory extends ContractFactory<
         { reserve0_: bigint; reserve1_: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<[boolean, bigint]>> => {
-      return testMethod(this, "mintFee", params);
+      return testMethod(this, "mintFee", params, getContractByCodeHash);
     },
     mint: async (
       params: TestContractParamsWithoutMaps<
@@ -306,7 +471,7 @@ class Factory extends ContractFactory<
         { sender: Address; amount0: bigint; amount1: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "mint", params);
+      return testMethod(this, "mint", params, getContractByCodeHash);
     },
     burn: async (
       params: TestContractParamsWithoutMaps<
@@ -314,7 +479,7 @@ class Factory extends ContractFactory<
         { sender: Address; liquidity: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<[bigint, bigint]>> => {
-      return testMethod(this, "burn", params);
+      return testMethod(this, "burn", params, getContractByCodeHash);
     },
     swap: async (
       params: TestContractParamsWithoutMaps<
@@ -329,7 +494,7 @@ class Factory extends ContractFactory<
         }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "swap", params);
+      return testMethod(this, "swap", params, getContractByCodeHash);
     },
     collectFeeManually: async (
       params: Omit<
@@ -337,7 +502,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "collectFeeManually", params);
+      return testMethod(
+        this,
+        "collectFeeManually",
+        params,
+        getContractByCodeHash
+      );
     },
     collectFeeAndUpdateKLast: async (
       params: TestContractParamsWithoutMaps<
@@ -345,9 +515,22 @@ class Factory extends ContractFactory<
         { feeAmount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "collectFeeAndUpdateKLast", params);
+      return testMethod(
+        this,
+        "collectFeeAndUpdateKLast",
+        params,
+        getContractByCodeHash
+      );
     },
   };
+
+  stateForTest(
+    initFields: TokenPairTypes.Fields,
+    asset?: Asset,
+    address?: string
+  ) {
+    return this.stateForTest_(initFields, asset, address, undefined);
+  }
 }
 
 // Use this object to test and deploy the contract
@@ -355,7 +538,7 @@ export const TokenPair = new Factory(
   Contract.fromJson(
     TokenPairContractJson,
     "",
-    "0ba23e4d958bc08a84958516f398b18390a393e91d4952b9816864565388a596",
+    "9671232e5ade9debbd4e44e01715c881bb7e6920e8efd7c121defbcc920aeba2",
     []
   )
 );
@@ -429,7 +612,7 @@ export class TokenPairInstance extends ContractInstance {
     );
   }
 
-  methods = {
+  view = {
     getSymbol: async (
       params?: TokenPairTypes.CallMethodParams<"getSymbol">
     ): Promise<TokenPairTypes.CallMethodResult<"getSymbol">> => {
@@ -490,6 +673,17 @@ export class TokenPairInstance extends ContractInstance {
     ): Promise<TokenPairTypes.CallMethodResult<"sqrt">> => {
       return callMethod(TokenPair, this, "sqrt", params, getContractByCodeHash);
     },
+    setFeeCollectorId: async (
+      params: TokenPairTypes.CallMethodParams<"setFeeCollectorId">
+    ): Promise<TokenPairTypes.CallMethodResult<"setFeeCollectorId">> => {
+      return callMethod(
+        TokenPair,
+        this,
+        "setFeeCollectorId",
+        params,
+        getContractByCodeHash
+      );
+    },
     getTokenPair: async (
       params?: TokenPairTypes.CallMethodParams<"getTokenPair">
     ): Promise<TokenPairTypes.CallMethodResult<"getTokenPair">> => {
@@ -508,6 +702,17 @@ export class TokenPairInstance extends ContractInstance {
         TokenPair,
         this,
         "getReserves",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    pairName_: async (
+      params?: TokenPairTypes.CallMethodParams<"pairName_">
+    ): Promise<TokenPairTypes.CallMethodResult<"pairName_">> => {
+      return callMethod(
+        TokenPair,
+        this,
+        "pairName_",
         params === undefined ? {} : params,
         getContractByCodeHash
       );
@@ -545,6 +750,28 @@ export class TokenPairInstance extends ContractInstance {
         getContractByCodeHash
       );
     },
+    update: async (
+      params: TokenPairTypes.CallMethodParams<"update">
+    ): Promise<TokenPairTypes.CallMethodResult<"update">> => {
+      return callMethod(
+        TokenPair,
+        this,
+        "update",
+        params,
+        getContractByCodeHash
+      );
+    },
+    mintFee: async (
+      params: TokenPairTypes.CallMethodParams<"mintFee">
+    ): Promise<TokenPairTypes.CallMethodResult<"mintFee">> => {
+      return callMethod(
+        TokenPair,
+        this,
+        "mintFee",
+        params,
+        getContractByCodeHash
+      );
+    },
     mint: async (
       params: TokenPairTypes.CallMethodParams<"mint">
     ): Promise<TokenPairTypes.CallMethodResult<"mint">> => {
@@ -555,16 +782,176 @@ export class TokenPairInstance extends ContractInstance {
     ): Promise<TokenPairTypes.CallMethodResult<"burn">> => {
       return callMethod(TokenPair, this, "burn", params, getContractByCodeHash);
     },
+    swap: async (
+      params: TokenPairTypes.CallMethodParams<"swap">
+    ): Promise<TokenPairTypes.CallMethodResult<"swap">> => {
+      return callMethod(TokenPair, this, "swap", params, getContractByCodeHash);
+    },
+    collectFeeManually: async (
+      params?: TokenPairTypes.CallMethodParams<"collectFeeManually">
+    ): Promise<TokenPairTypes.CallMethodResult<"collectFeeManually">> => {
+      return callMethod(
+        TokenPair,
+        this,
+        "collectFeeManually",
+        params === undefined ? {} : params,
+        getContractByCodeHash
+      );
+    },
+    collectFeeAndUpdateKLast: async (
+      params: TokenPairTypes.CallMethodParams<"collectFeeAndUpdateKLast">
+    ): Promise<TokenPairTypes.CallMethodResult<"collectFeeAndUpdateKLast">> => {
+      return callMethod(
+        TokenPair,
+        this,
+        "collectFeeAndUpdateKLast",
+        params,
+        getContractByCodeHash
+      );
+    },
   };
 
-  async multicall<Calls extends TokenPairTypes.MultiCallParams>(
-    calls: Calls
-  ): Promise<TokenPairTypes.MultiCallResults<Calls>> {
+  transact = {
+    getSymbol: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getSymbol">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"getSymbol">> => {
+      return signExecuteMethod(TokenPair, this, "getSymbol", params);
+    },
+    getName: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getName">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"getName">> => {
+      return signExecuteMethod(TokenPair, this, "getName", params);
+    },
+    getDecimals: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getDecimals">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"getDecimals">> => {
+      return signExecuteMethod(TokenPair, this, "getDecimals", params);
+    },
+    getTotalSupply: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getTotalSupply">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"getTotalSupply">> => {
+      return signExecuteMethod(TokenPair, this, "getTotalSupply", params);
+    },
+    uqdiv: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"uqdiv">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"uqdiv">> => {
+      return signExecuteMethod(TokenPair, this, "uqdiv", params);
+    },
+    sqrt: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"sqrt">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"sqrt">> => {
+      return signExecuteMethod(TokenPair, this, "sqrt", params);
+    },
+    setFeeCollectorId: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"setFeeCollectorId">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"setFeeCollectorId">> => {
+      return signExecuteMethod(TokenPair, this, "setFeeCollectorId", params);
+    },
+    getTokenPair: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getTokenPair">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"getTokenPair">> => {
+      return signExecuteMethod(TokenPair, this, "getTokenPair", params);
+    },
+    getReserves: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getReserves">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"getReserves">> => {
+      return signExecuteMethod(TokenPair, this, "getReserves", params);
+    },
+    pairName_: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"pairName_">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"pairName_">> => {
+      return signExecuteMethod(TokenPair, this, "pairName_", params);
+    },
+    getBlockTimeStampLast: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getBlockTimeStampLast">
+    ): Promise<
+      TokenPairTypes.SignExecuteMethodResult<"getBlockTimeStampLast">
+    > => {
+      return signExecuteMethod(
+        TokenPair,
+        this,
+        "getBlockTimeStampLast",
+        params
+      );
+    },
+    getPrice0CumulativeLast: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getPrice0CumulativeLast">
+    ): Promise<
+      TokenPairTypes.SignExecuteMethodResult<"getPrice0CumulativeLast">
+    > => {
+      return signExecuteMethod(
+        TokenPair,
+        this,
+        "getPrice0CumulativeLast",
+        params
+      );
+    },
+    getPrice1CumulativeLast: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"getPrice1CumulativeLast">
+    ): Promise<
+      TokenPairTypes.SignExecuteMethodResult<"getPrice1CumulativeLast">
+    > => {
+      return signExecuteMethod(
+        TokenPair,
+        this,
+        "getPrice1CumulativeLast",
+        params
+      );
+    },
+    update: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"update">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"update">> => {
+      return signExecuteMethod(TokenPair, this, "update", params);
+    },
+    mintFee: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"mintFee">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"mintFee">> => {
+      return signExecuteMethod(TokenPair, this, "mintFee", params);
+    },
+    mint: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"mint">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"mint">> => {
+      return signExecuteMethod(TokenPair, this, "mint", params);
+    },
+    burn: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"burn">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"burn">> => {
+      return signExecuteMethod(TokenPair, this, "burn", params);
+    },
+    swap: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"swap">
+    ): Promise<TokenPairTypes.SignExecuteMethodResult<"swap">> => {
+      return signExecuteMethod(TokenPair, this, "swap", params);
+    },
+    collectFeeManually: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"collectFeeManually">
+    ): Promise<
+      TokenPairTypes.SignExecuteMethodResult<"collectFeeManually">
+    > => {
+      return signExecuteMethod(TokenPair, this, "collectFeeManually", params);
+    },
+    collectFeeAndUpdateKLast: async (
+      params: TokenPairTypes.SignExecuteMethodParams<"collectFeeAndUpdateKLast">
+    ): Promise<
+      TokenPairTypes.SignExecuteMethodResult<"collectFeeAndUpdateKLast">
+    > => {
+      return signExecuteMethod(
+        TokenPair,
+        this,
+        "collectFeeAndUpdateKLast",
+        params
+      );
+    },
+  };
+
+  async multicall<Callss extends TokenPairTypes.MultiCallParams[]>(
+    ...callss: Callss
+  ): Promise<TokenPairTypes.MulticallReturnType<Callss>> {
     return (await multicallMethods(
       TokenPair,
       this,
-      calls,
+      callss,
       getContractByCodeHash
-    )) as TokenPairTypes.MultiCallResults<Calls>;
+    )) as TokenPairTypes.MulticallReturnType<Callss>;
   }
 }

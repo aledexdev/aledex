@@ -21,10 +21,14 @@ import {
   callMethod,
   multicallMethods,
   fetchContractState,
+  Asset,
   ContractInstance,
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
   addStdIdToFields,
   encodeContractFields,
 } from "@alephium/web3";
@@ -50,9 +54,41 @@ export namespace TokenPairFactoryTypes {
   }>;
 
   export interface CallMethodTable {
+    setFeeCollectorFactory: {
+      params: CallContractParams<{ factory: HexString }>;
+      result: CallContractResult<null>;
+    };
+    updateFeeSetter: {
+      params: CallContractParams<{ newFeeSetter: Address }>;
+      result: CallContractResult<null>;
+    };
     getFeeSetter: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<Address>;
+    };
+    enableFeeCollector: {
+      params: CallContractParams<{ tokenPair: HexString; alphAmount: bigint }>;
+      result: CallContractResult<null>;
+    };
+    updateFeeCollector: {
+      params: CallContractParams<{
+        tokenPair: HexString;
+        newFeeCollectorId: HexString;
+      }>;
+      result: CallContractResult<null>;
+    };
+    sortTokens: {
+      params: CallContractParams<{ tokenA: HexString; tokenB: HexString }>;
+      result: CallContractResult<[HexString, HexString]>;
+    };
+    createPair: {
+      params: CallContractParams<{
+        payer: Address;
+        alphAmount: bigint;
+        tokenAId: HexString;
+        tokenBId: HexString;
+      }>;
+      result: CallContractResult<null>;
     };
   }
   export type CallMethodParams<T extends keyof CallMethodTable> =
@@ -67,6 +103,58 @@ export namespace TokenPairFactoryTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+  export type MulticallReturnType<Callss extends MultiCallParams[]> = {
+    [index in keyof Callss]: MultiCallResults<Callss[index]>;
+  };
+
+  export interface SignExecuteMethodTable {
+    setFeeCollectorFactory: {
+      params: SignExecuteContractMethodParams<{ factory: HexString }>;
+      result: SignExecuteScriptTxResult;
+    };
+    updateFeeSetter: {
+      params: SignExecuteContractMethodParams<{ newFeeSetter: Address }>;
+      result: SignExecuteScriptTxResult;
+    };
+    getFeeSetter: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    enableFeeCollector: {
+      params: SignExecuteContractMethodParams<{
+        tokenPair: HexString;
+        alphAmount: bigint;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    updateFeeCollector: {
+      params: SignExecuteContractMethodParams<{
+        tokenPair: HexString;
+        newFeeCollectorId: HexString;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    sortTokens: {
+      params: SignExecuteContractMethodParams<{
+        tokenA: HexString;
+        tokenB: HexString;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+    createPair: {
+      params: SignExecuteContractMethodParams<{
+        payer: Address;
+        alphAmount: bigint;
+        tokenAId: HexString;
+        tokenBId: HexString;
+      }>;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<
@@ -81,16 +169,12 @@ class Factory extends ContractFactory<
     );
   }
 
-  getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as TokenPairFactoryTypes.Fields;
-  }
-
   eventIndex = { PairCreated: 0 };
   consts = {
     ErrorCodes: {
-      IdenticalTokenIds: BigInt(11),
-      TokenNotExist: BigInt(15),
-      InvalidCaller: BigInt(16),
+      IdenticalTokenIds: BigInt("11"),
+      TokenNotExist: BigInt("15"),
+      InvalidCaller: BigInt("16"),
     },
   };
 
@@ -105,7 +189,12 @@ class Factory extends ContractFactory<
         { factory: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "setFeeCollectorFactory", params);
+      return testMethod(
+        this,
+        "setFeeCollectorFactory",
+        params,
+        getContractByCodeHash
+      );
     },
     updateFeeSetter: async (
       params: TestContractParamsWithoutMaps<
@@ -113,7 +202,7 @@ class Factory extends ContractFactory<
         { newFeeSetter: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "updateFeeSetter", params);
+      return testMethod(this, "updateFeeSetter", params, getContractByCodeHash);
     },
     getFeeSetter: async (
       params: Omit<
@@ -121,7 +210,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
-      return testMethod(this, "getFeeSetter", params);
+      return testMethod(this, "getFeeSetter", params, getContractByCodeHash);
     },
     enableFeeCollector: async (
       params: TestContractParamsWithoutMaps<
@@ -129,7 +218,12 @@ class Factory extends ContractFactory<
         { tokenPair: HexString; alphAmount: bigint }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "enableFeeCollector", params);
+      return testMethod(
+        this,
+        "enableFeeCollector",
+        params,
+        getContractByCodeHash
+      );
     },
     updateFeeCollector: async (
       params: TestContractParamsWithoutMaps<
@@ -137,7 +231,12 @@ class Factory extends ContractFactory<
         { tokenPair: HexString; newFeeCollectorId: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "updateFeeCollector", params);
+      return testMethod(
+        this,
+        "updateFeeCollector",
+        params,
+        getContractByCodeHash
+      );
     },
     sortTokens: async (
       params: TestContractParamsWithoutMaps<
@@ -145,7 +244,7 @@ class Factory extends ContractFactory<
         { tokenA: HexString; tokenB: HexString }
       >
     ): Promise<TestContractResultWithoutMaps<[HexString, HexString]>> => {
-      return testMethod(this, "sortTokens", params);
+      return testMethod(this, "sortTokens", params, getContractByCodeHash);
     },
     createPair: async (
       params: TestContractParamsWithoutMaps<
@@ -158,9 +257,17 @@ class Factory extends ContractFactory<
         }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "createPair", params);
+      return testMethod(this, "createPair", params, getContractByCodeHash);
     },
   };
+
+  stateForTest(
+    initFields: TokenPairFactoryTypes.Fields,
+    asset?: Asset,
+    address?: string
+  ) {
+    return this.stateForTest_(initFields, asset, address, undefined);
+  }
 }
 
 // Use this object to test and deploy the contract
@@ -168,7 +275,7 @@ export const TokenPairFactory = new Factory(
   Contract.fromJson(
     TokenPairFactoryContractJson,
     "",
-    "44144899a2b71465a80654889afa8a2bf4a8f3cd0f30ad1880d2ffc7c12ad18b",
+    "65dbcbdf27caaa4f82a0defa5c6bfce12912e5f10c4542c7072f65fe62c5ef5c",
     []
   )
 );
@@ -200,7 +307,31 @@ export class TokenPairFactoryInstance extends ContractInstance {
     );
   }
 
-  methods = {
+  view = {
+    setFeeCollectorFactory: async (
+      params: TokenPairFactoryTypes.CallMethodParams<"setFeeCollectorFactory">
+    ): Promise<
+      TokenPairFactoryTypes.CallMethodResult<"setFeeCollectorFactory">
+    > => {
+      return callMethod(
+        TokenPairFactory,
+        this,
+        "setFeeCollectorFactory",
+        params,
+        getContractByCodeHash
+      );
+    },
+    updateFeeSetter: async (
+      params: TokenPairFactoryTypes.CallMethodParams<"updateFeeSetter">
+    ): Promise<TokenPairFactoryTypes.CallMethodResult<"updateFeeSetter">> => {
+      return callMethod(
+        TokenPairFactory,
+        this,
+        "updateFeeSetter",
+        params,
+        getContractByCodeHash
+      );
+    },
     getFeeSetter: async (
       params?: TokenPairFactoryTypes.CallMethodParams<"getFeeSetter">
     ): Promise<TokenPairFactoryTypes.CallMethodResult<"getFeeSetter">> => {
@@ -212,16 +343,132 @@ export class TokenPairFactoryInstance extends ContractInstance {
         getContractByCodeHash
       );
     },
+    enableFeeCollector: async (
+      params: TokenPairFactoryTypes.CallMethodParams<"enableFeeCollector">
+    ): Promise<
+      TokenPairFactoryTypes.CallMethodResult<"enableFeeCollector">
+    > => {
+      return callMethod(
+        TokenPairFactory,
+        this,
+        "enableFeeCollector",
+        params,
+        getContractByCodeHash
+      );
+    },
+    updateFeeCollector: async (
+      params: TokenPairFactoryTypes.CallMethodParams<"updateFeeCollector">
+    ): Promise<
+      TokenPairFactoryTypes.CallMethodResult<"updateFeeCollector">
+    > => {
+      return callMethod(
+        TokenPairFactory,
+        this,
+        "updateFeeCollector",
+        params,
+        getContractByCodeHash
+      );
+    },
+    sortTokens: async (
+      params: TokenPairFactoryTypes.CallMethodParams<"sortTokens">
+    ): Promise<TokenPairFactoryTypes.CallMethodResult<"sortTokens">> => {
+      return callMethod(
+        TokenPairFactory,
+        this,
+        "sortTokens",
+        params,
+        getContractByCodeHash
+      );
+    },
+    createPair: async (
+      params: TokenPairFactoryTypes.CallMethodParams<"createPair">
+    ): Promise<TokenPairFactoryTypes.CallMethodResult<"createPair">> => {
+      return callMethod(
+        TokenPairFactory,
+        this,
+        "createPair",
+        params,
+        getContractByCodeHash
+      );
+    },
   };
 
-  async multicall<Calls extends TokenPairFactoryTypes.MultiCallParams>(
-    calls: Calls
-  ): Promise<TokenPairFactoryTypes.MultiCallResults<Calls>> {
+  transact = {
+    setFeeCollectorFactory: async (
+      params: TokenPairFactoryTypes.SignExecuteMethodParams<"setFeeCollectorFactory">
+    ): Promise<
+      TokenPairFactoryTypes.SignExecuteMethodResult<"setFeeCollectorFactory">
+    > => {
+      return signExecuteMethod(
+        TokenPairFactory,
+        this,
+        "setFeeCollectorFactory",
+        params
+      );
+    },
+    updateFeeSetter: async (
+      params: TokenPairFactoryTypes.SignExecuteMethodParams<"updateFeeSetter">
+    ): Promise<
+      TokenPairFactoryTypes.SignExecuteMethodResult<"updateFeeSetter">
+    > => {
+      return signExecuteMethod(
+        TokenPairFactory,
+        this,
+        "updateFeeSetter",
+        params
+      );
+    },
+    getFeeSetter: async (
+      params: TokenPairFactoryTypes.SignExecuteMethodParams<"getFeeSetter">
+    ): Promise<
+      TokenPairFactoryTypes.SignExecuteMethodResult<"getFeeSetter">
+    > => {
+      return signExecuteMethod(TokenPairFactory, this, "getFeeSetter", params);
+    },
+    enableFeeCollector: async (
+      params: TokenPairFactoryTypes.SignExecuteMethodParams<"enableFeeCollector">
+    ): Promise<
+      TokenPairFactoryTypes.SignExecuteMethodResult<"enableFeeCollector">
+    > => {
+      return signExecuteMethod(
+        TokenPairFactory,
+        this,
+        "enableFeeCollector",
+        params
+      );
+    },
+    updateFeeCollector: async (
+      params: TokenPairFactoryTypes.SignExecuteMethodParams<"updateFeeCollector">
+    ): Promise<
+      TokenPairFactoryTypes.SignExecuteMethodResult<"updateFeeCollector">
+    > => {
+      return signExecuteMethod(
+        TokenPairFactory,
+        this,
+        "updateFeeCollector",
+        params
+      );
+    },
+    sortTokens: async (
+      params: TokenPairFactoryTypes.SignExecuteMethodParams<"sortTokens">
+    ): Promise<TokenPairFactoryTypes.SignExecuteMethodResult<"sortTokens">> => {
+      return signExecuteMethod(TokenPairFactory, this, "sortTokens", params);
+    },
+    createPair: async (
+      params: TokenPairFactoryTypes.SignExecuteMethodParams<"createPair">
+    ): Promise<TokenPairFactoryTypes.SignExecuteMethodResult<"createPair">> => {
+      return signExecuteMethod(TokenPairFactory, this, "createPair", params);
+    },
+  };
+
+  async multicall<Callss extends TokenPairFactoryTypes.MultiCallParams[]>(
+    ...callss: Callss
+  ): Promise<TokenPairFactoryTypes.MulticallReturnType<Callss>> {
     return (await multicallMethods(
       TokenPairFactory,
       this,
-      calls,
+      callss,
       getContractByCodeHash
-    )) as TokenPairFactoryTypes.MultiCallResults<Calls>;
+    )) as TokenPairFactoryTypes.MulticallReturnType<Callss>;
   }
 }

@@ -1,6 +1,5 @@
 import {
   web3,
-  Project,
   TestContractParams,
   addressFromContractId,
   AssetOutput,
@@ -14,7 +13,6 @@ import { TokenFaucet, TokenFaucetTypes, Withdraw } from '../artifacts/ts'
 describe('integration tests', () => {
   beforeAll(async () => {
     web3.setCurrentNodeProvider('http://127.0.0.1:22973', undefined, fetch)
-    await Project.build()
   })
 
   it('should withdraw on devnet', async () => {

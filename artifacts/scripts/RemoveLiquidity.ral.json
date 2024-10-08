@@ -1,5 +1,5 @@
 {
-  "version": "v2.12.0",
+  "version": "v3.6.6",
   "name": "RemoveLiquidity",
   "bytecodeTemplate": "0101030000000e{0}{2}{3}a3{2}{0}{3}{4}{5}{6}13060c{1}0102",
   "fieldsSig": {
@@ -34,9 +34,6 @@
   "functions": [
     {
       "name": "main",
-      "usePreapprovedAssets": true,
-      "useAssetsInContract": false,
-      "isPublic": true,
       "paramNames": [],
       "paramTypes": [],
       "paramIsMutable": [],
